@@ -171,6 +171,9 @@ export default function CsvUploader() {
         return "#16a34a"; 
     };
     
+    const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
+
     const chartData = {
         labels: ["Score", "Remaining"],
         datasets: [
@@ -208,14 +211,14 @@ export default function CsvUploader() {
         {csvData && ( 
             <div className="mt-4">
                 <h3 className="font-bold mb-2">Parsed CSV Preview:</h3>
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <div className="bg-white shadow rounded border-l-4 border-green-500 p-6">
                         <h5 className="text-green-600 text-lg font-semibold mb-2">Total Expenses</h5>
-                        <p id="today-count" className="text-5xl font-bold text-gray-900">{getAmountExpenses()}</p>
+                        <p id="today-count" className="text-5xl font-bold text-gray-900">{formatCurrency(getAmountExpenses())}</p>
                     </div>
                     <div className="bg-white shadow rounded border-l-4 border-yellow-500 p-6">
                         <h5 className="text-yellow-600 text-lg font-semibold mb-2">Total Income</h5>
-                        <p id="week-count" className="text-5xl font-bold text-gray-900">{getAmountIncome()}</p>
+                        <p id="week-count" className="text-5xl font-bold text-gray-900">{formatCurrency(getAmountIncome())}</p>
                     </div>
                     <div className="bg-white shadow rounded border-l-4 border-blue-500 p-6">
                         <h5 className="text-blue-600 text-lg font-semibold mb-2">Financial Score</h5>
@@ -223,15 +226,15 @@ export default function CsvUploader() {
                     </div>
                     <div className="bg-white shadow rounded border-l-4 border-blue-500 p-6">
                         <h5 className="text-blue-600 text-lg font-semibold mb-2">Savings</h5>
-                        <p id="completed-count" className="text-5xl font-bold text-gray-900">{getSavings()}</p>
+                        <p id="completed-count" className="text-5xl font-bold text-gray-900">{formatCurrency(getSavings())}</p>
                     </div>
                     <div className="bg-white shadow rounded border-l-4 border-purple-500 p-6">
                         <h5 className="text-purple-600 text-lg font-semibold mb-2">Total Investments</h5>
-                        <p id="total-count" className="text-5xl font-bold text-gray-900">{getAmountInvestments()}</p>
+                        <p id="total-count" className="text-5xl font-bold text-gray-900">{formatCurrency(getAmountInvestments())}</p>
                     </div>
                     <div className="bg-white shadow rounded border-l-4 border-red-500 p-6">
                         <h5 className="text-red-600 text-lg font-semibold mb-2">Total Loans</h5>
-                        <p id="total-count" className="text-5xl font-bold text-gray-900">{getAmountLoans()}</p>
+                        <p id="total-count" className="text-5xl font-bold text-gray-900">{formatCurrency(getAmountLoans())}</p>
                     </div>  
                 </div>
                 
