@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Papa from "papaparse";
 import { Line,Pie } from "react-chartjs-2";
 import { Chart, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement } from "chart.js";
@@ -14,6 +14,10 @@ export default function CsvUploader() {
     const [csvData, setCsvData] = useState<any[] | null>(null);
     const [categoryFilter, setCategoryFilter] = useState<string>("All");
     const [dateFilter, setDateFilter] = useState<string>("All");
+    const [currentPage, setCurrentPage] = useState(1);
+    
+    const pageSize = 10;
+    useEffect(() => { setCurrentPage(1); }, [categoryFilter, dateFilter]);
         
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
@@ -96,6 +100,9 @@ export default function CsvUploader() {
             ],
         };
     };
+
+    const totalPages = Math.ceil(filteredData.length / pageSize);
+    const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
     
     const getAmountIncome = () => {
         if (!csvData) return 0;
@@ -227,6 +234,12 @@ export default function CsvUploader() {
                         <p id="total-count" className="text-5xl font-bold text-gray-900">{getAmountLoans()}</p>
                     </div>  
                 </div>
+                
+            </div>
+        )}
+        
+        {csvData && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
                 <div className="bg-white shadow rounded p-6 flex flex-col items-center">
                     <h5 className="text-blue-600 text-lg font-semibold mb-2">Financial Score</h5>
                     <HalfDoughnutChart data={chartData} options={chartOptions} width={200} height={100} />
@@ -234,11 +247,6 @@ export default function CsvUploader() {
                         {score.toFixed(2)}%
                     </p>
                 </div>
-            </div>
-        )}
-        
-        {csvData && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
                 <div className="bg-white p-6 rounded-lg shadow-md flex flex-col">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Expenses vs Income</h3>
                     <div className="flex-1 flex items-center justify-center">
@@ -246,18 +254,20 @@ export default function CsvUploader() {
                             labels: getLabels(),
                             datasets: [
                                 {
-                                    data: [getAmountExpenses(), getAmountIncome(),getAmountLoans(),getAmountInvestments()],
+                                    data: [getAmountExpenses(), getAmountIncome(),getAmountInvestments(),getAmountLoans(),getSavings()],
                                     backgroundColor: [
                                         "rgba(255, 99, 132, 0.7)",
                                         "rgba(54, 162, 235, 0.7)",
                                         "rgba(255, 206, 86, 0.7)",
                                         "rgba(75, 192, 192, 0.7)",
+                                        "rgba(165, 159, 75, 0.7)",
                                     ],
                                     borderColor: [
                                         "rgba(255, 99, 132, 1)",
                                         "rgba(54, 162, 235, 1)",
                                         "rgba(255, 206, 86, 0.7)",
                                         "rgba(75, 192, 192, 0.7)",
+                                        "rgba(165, 159, 75, 0.7)",
                                     ],
                                     borderWidth: 1,
                                 },
@@ -280,7 +290,7 @@ export default function CsvUploader() {
         
         {csvData && ( 
             <div className="mt-6">
-                <h3 className="text-lg font-semibold text-white mb-4">📊 CSV Data Table</h3>
+                <h3 className="text-lg font-semibold text-white mb-4">Detailed Breakdown by Category</h3>
                 <div className="flex flex-wrap gap-6 mb-6 items-center">
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-1">Category</label>
@@ -326,21 +336,32 @@ export default function CsvUploader() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredData.length === 0 ? (
-                                <tr>
-                                    <td colSpan={csvData[0] ? Object.keys(csvData[0]).length : 1} className="text-center py-6 text-gray-500">No data found.</td>
-                                </tr>
-                            ) : (
-                                filteredData.map((row, idx) => (
-                                <tr key={idx} className="even:bg-gray-900 hover:bg-gray-700 transition-colors">
-                                    {Object.keys(row).map((key) => (
-                                        <td key={key} className="px-4 py-2 border-b border-gray-700">{row[key]}</td>
-                                    ))}
-                                </tr>
-                                ))
-                            )}
+                        {paginatedData.length === 0 ? (
+                            <tr>
+                            <td colSpan={csvData[0] ? Object.keys(csvData[0]).length : 1} className="text-center py-6 text-gray-500">No data found.</td>
+                            </tr>
+                        ) : (
+                            paginatedData.map((row, idx) => (
+                            <tr key={idx} className="even:bg-gray-900 hover:bg-gray-700 transition-colors">
+                                {Object.keys(row).map((key) => (
+                                <td key={key} className="px-4 py-2 border-b border-gray-700">{row[key]}</td>
+                                ))}
+                            </tr>
+                            ))
+                        )}
                         </tbody>
                     </table>
+                </div>
+                <div className="flex justify-between items-center mt-2 text-gray-300 text-xs">
+                    <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} 
+                    className="px-3 py-1 rounded bg-gray-800 border border-gray-700 mr-2 disabled:opacity-50">
+                        Previous
+                    </button>
+                    <span>Page {currentPage} of {totalPages}</span>
+                    <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} 
+                    className="px-3 py-1 rounded bg-gray-800 border border-gray-700 ml-2 disabled:opacity-50">
+                        Next
+                    </button>
                 </div>
             </div>
         )}
