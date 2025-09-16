@@ -322,7 +322,7 @@ export default function CsvUploader() {
                     </span>
                     :{" "}
                     <span className="text-blue-400 font-semibold">
-                        {getFilteredCategoryTotal()}
+                        {formatCurrency(getFilteredCategoryTotal())}
                     </span>
                 </div>
                 
