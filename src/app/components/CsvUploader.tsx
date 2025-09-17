@@ -211,30 +211,30 @@ export default function CsvUploader() {
         {csvData && ( 
             <div className="mt-4">
                 <h3 className="font-bold mb-2">Parsed CSV Preview:</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-6">
                     <div className="bg-white shadow rounded border-l-4 border-green-500 p-6">
-                        <h5 className="text-green-600 text-lg font-semibold mb-2">Total Expenses</h5>
-                        <p id="today-count" className="text-5xl font-bold text-gray-900">{formatCurrency(getAmountExpenses())}</p>
+                        <h5 className="text-green-600 text-sm font-semibold mb-2">Total Expenses</h5>
+                        <p id="today-count" className="text-xl font-bold text-gray-900">{formatCurrency(getAmountExpenses())}</p>
                     </div>
                     <div className="bg-white shadow rounded border-l-4 border-yellow-500 p-6">
-                        <h5 className="text-yellow-600 text-lg font-semibold mb-2">Total Income</h5>
-                        <p id="week-count" className="text-5xl font-bold text-gray-900">{formatCurrency(getAmountIncome())}</p>
+                        <h5 className="text-yellow-600 text-sm font-semibold mb-2">Total Income</h5>
+                        <p id="week-count" className="text-xl font-bold text-gray-900">{formatCurrency(getAmountIncome())}</p>
                     </div>
                     <div className="bg-white shadow rounded border-l-4 border-blue-500 p-6">
-                        <h5 className="text-blue-600 text-lg font-semibold mb-2">Financial Score</h5>
-                        <p id="month-count" className="text-5xl font-bold text-gray-900">{Math.round(getFinancialScore() * 100) / 100}</p>
+                        <h5 className="text-blue-600 text-sm font-semibold mb-2">Financial Score</h5>
+                        <p id="month-count" className="text-xl font-bold text-gray-900">{Math.round(getFinancialScore() * 100) / 100}</p>
                     </div>
                     <div className="bg-white shadow rounded border-l-4 border-blue-500 p-6">
-                        <h5 className="text-blue-600 text-lg font-semibold mb-2">Savings</h5>
-                        <p id="completed-count" className="text-5xl font-bold text-gray-900">{formatCurrency(getSavings())}</p>
+                        <h5 className="text-blue-600 text-sm font-semibold mb-2">Savings</h5>
+                        <p id="completed-count" className="text-xl font-bold text-gray-900">{formatCurrency(getSavings())}</p>
                     </div>
                     <div className="bg-white shadow rounded border-l-4 border-purple-500 p-6">
-                        <h5 className="text-purple-600 text-lg font-semibold mb-2">Total Investments</h5>
-                        <p id="total-count" className="text-5xl font-bold text-gray-900">{formatCurrency(getAmountInvestments())}</p>
+                        <h5 className="text-purple-600 text-sm font-semibold mb-2">Total Investments</h5>
+                        <p id="total-count" className="text-xl font-bold text-gray-900">{formatCurrency(getAmountInvestments())}</p>
                     </div>
                     <div className="bg-white shadow rounded border-l-4 border-red-500 p-6">
-                        <h5 className="text-red-600 text-lg font-semibold mb-2">Total Loans</h5>
-                        <p id="total-count" className="text-5xl font-bold text-gray-900">{formatCurrency(getAmountLoans())}</p>
+                        <h5 className="text-red-600 text-sm font-semibold mb-2">Total Loans</h5>
+                        <p id="total-count" className="text-xl font-bold text-gray-900">{formatCurrency(getAmountLoans())}</p>
                     </div>  
                 </div>
                 
@@ -347,8 +347,17 @@ export default function CsvUploader() {
                             paginatedData.map((row, idx) => (
                             <tr key={idx} className="even:bg-gray-900 hover:bg-gray-700 transition-colors">
                                 {Object.keys(row).map((key) => (
-                                <td key={key} className="px-4 py-2 border-b border-gray-700">{row[key]}</td>
+                                    key === 'Amount' ? (
+                                        <td key={key} className="px-4 py-2 border-b border-gray-700">
+                                            {formatCurrency(parseFloat(row[key]))}
+                                        </td>
+                                    ) : (
+                                        <td key={key} className="px-4 py-2 border-b border-gray-700">
+                                            {row[key]}
+                                        </td>
+                                    )
                                 ))}
+
                             </tr>
                             ))
                         )}
