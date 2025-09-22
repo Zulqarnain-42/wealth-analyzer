@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import CsvUploader from "./components/CsvUploader";
 import { Line, Pie } from "react-chartjs-2";
-import SpendingTable from "./components/SpendingTable";
+import SpendingTable from "./SpendingTable";
 
 export default function Home() {
   const [apiUrl, setApiUrl] = useState('');
@@ -14,6 +14,9 @@ export default function Home() {
   const fetchData = async () => {
     setLoading(true);
     setError('');
+
+    
+
     try {
       const res = await fetch(apiUrl);
       if (!res.ok) throw new Error(`API Error: ${res.status}`);
@@ -28,6 +31,10 @@ export default function Home() {
       }
       setApiData([]);
     } finally {
+      if (!apiUrl.trim() || !apiDatatable.trim()) {
+      setError("Both API URL and Datatable URL are required.");
+      return;
+    }
       setLoading(false);
     }
   };
@@ -110,14 +117,32 @@ export default function Home() {
 </div>
 
 
-      <div className="flex gap-2 mb-2">
-        <input type="text" placeholder="Enter API URL" value={apiUrl} onChange={(e) => setApiUrl(e.target.value)} className="border p-2 rounded w-full"/>
-        <input type="text" placeholder="Enter Datatable URL" value={apiDatatable} onChange={(e) => setApiDatatable(e.target.value)} className="border p-2 rounded w-full"/>
-        <button onClick={fetchData} className="bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold 
+<div className="flex gap-2 mb-2">
+        <input
+          type="text"
+          placeholder="Enter API URL"
+          value={apiUrl}
+          onChange={(e) => setApiUrl(e.target.value)}
+          className="border p-2 rounded w-full"
+        />
+        <input
+          type="text"
+          placeholder="Enter Datatable URL"
+          value={apiDatatable}
+          onChange={(e) => setApiDatatable(e.target.value)}
+          className="border p-2 rounded w-full"
+        />
+        <button
+          onClick={fetchData}
+          className="bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold 
           px-6 py-3 rounded-full shadow-md hover:from-blue-600 hover:to-blue-800 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 
-          transition-all duration-300">Fetch
+          transition-all duration-300"
+        >
+          Fetch
         </button>
       </div>
+
+      {error && <p className="text-red-600 font-semibold">{error}</p>}
       
       {loading && <p className="text-gray-600">Loading...</p>}
       {error && <p className="text-red-500">Error: {error}</p>}

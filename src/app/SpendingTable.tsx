@@ -36,6 +36,7 @@ export default function SpendingTable({ accounts,apiUrl  }: SpendingTableProps) 
   const [total, setTotal] = useState(0);
   const totalPages = Math.ceil(total / pageSize);
   const [selectedAccount, setSelectedAccount] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setPage(1); 
@@ -45,7 +46,14 @@ export default function SpendingTable({ accounts,apiUrl  }: SpendingTableProps) 
     fetchData();
   }, [page, pageSize, selectedAccount]);
 
+const handleExport = () => {
+  window.open('/api/export-csv', '_blank');
+};
+
+
   const fetchData = async () => {
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     if (!apiUrl) return;
     const url = new URL(apiUrl);
     url.searchParams.set("page", String(page));
@@ -58,6 +66,8 @@ export default function SpendingTable({ accounts,apiUrl  }: SpendingTableProps) 
       setTotal(Number(json.totalCount));
     } catch (err) {
       console.error("Failed to fetch spending data:", err);
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -96,10 +106,6 @@ export default function SpendingTable({ accounts,apiUrl  }: SpendingTableProps) 
     document.body.removeChild(link);
   };
   
-  const handleDownload = () => {
-    alert('Download started');
-  };
-  
   return (
     <div className="space-y-4">
       {data.length === 0 ? 
@@ -114,7 +120,7 @@ export default function SpendingTable({ accounts,apiUrl  }: SpendingTableProps) 
             <select id="pageSize" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
               className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             >
-              {[25, 100, 1000, 5000].map((size) => (
+              {[25, 100, 1000, 5000,10000].map((size) => (
                 <option key={size} value={size}>
                   {size}
                 </option>
@@ -138,12 +144,42 @@ export default function SpendingTable({ accounts,apiUrl  }: SpendingTableProps) 
           <button onClick={exportToCSV} className="px-4 py-1 rounded bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition">
             Export CSV
           </button>
-          <button onClick={handleDownload} className="px-4 py-1 rounded bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition">
-            Export All
-          </button>
-          <button onClick={fetchData} className="px-4 py-1 rounded bg-gradient-to-r from-purple-500 to-purple-700 text-white text-sm font-semibold shadow-md hover:from-purple-600 hover:to-purple-800 transition-all">
-            Refresh
-          </button>
+          <button onClick={handleExport} className="px-4 py-1 rounded bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-shadow shadow-sm hover:shadow-md">
+  Export All CSV
+</button>
+
+          <button
+      onClick={fetchData}
+      disabled={loading}
+      className={`relative flex items-center justify-center ${
+        loading ? 'w-10 h-10 rounded-full' : 'px-4 py-1 rounded'
+      } bg-gradient-to-r from-purple-500 to-purple-700 text-white text-sm font-semibold shadow-md hover:from-purple-600 hover:to-purple-800 transition-all`}
+    >
+      {loading ? (
+        <svg
+          className="animate-spin h-5 w-5 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+          ></path>
+        </svg>
+      ) : (
+        'Refresh'
+      )}
+    </button>
         </div>
       </div>
       <Table>
